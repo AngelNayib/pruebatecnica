@@ -6,7 +6,7 @@
             <h4>Crear Nuevo Producto</h4>
         </div>
         <div class="card-body">
-            <form method="POST" action="{{ route('producto.update', $producto) }}">
+            <form method="POST" action="{{ route('producto.update', $producto) }}" enctype="multipart/form-data">
                 @method('PUT')
                 @csrf
                 <div class="container">
@@ -61,6 +61,18 @@
                             @error('category_id')
                                 <div class="alert alert-danger">{{ $message }}</div>
                             @enderror
+                        </div>
+                        <div class="col-4">
+                            <label for="formFile" class="form-label">Imagen del Producto</label>
+                            <input class="form-control" type="file" id="formFile" name="image" accept="image/*">
+                            @error('image')
+                                <div class="alert alert-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="row mt-5">
+                        <div class="col-12">
+                            <img src="{{ asset($producto->image) }}" alt="image" width="200px" height="200px">
                         </div>
                     </div>
                     <div class="row mt-4">

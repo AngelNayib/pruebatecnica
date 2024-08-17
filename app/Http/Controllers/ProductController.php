@@ -7,12 +7,12 @@ use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
     public function index()
     {
-
         return view('producto.index', [
             'productos' => Product::orderBy('created_at', 'asc')->paginate(5)
         ]);
@@ -29,11 +29,17 @@ class ProductController extends Controller
     {
         try {
             DB::beginTransaction();
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $fileUrl = Storage::disk('public')->put('images', $file);
+            }
+
             Product::create([
                 'nombre' => $request->nombre,
                 'descripcion' => $request->descripcion,
                 'precio' => $request->precio,
                 'cantidad' => $request->cantidad,
+                'image' => 'storage/' . $fileUrl,
                 'category_id' => $request->category_id
             ]);
             DB::commit();

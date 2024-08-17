@@ -11,6 +11,8 @@ class Category extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $guarded = [];
+
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);

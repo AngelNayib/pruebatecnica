@@ -17,10 +17,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('producto.index');
 });
-
-Route::get('/producto', [ProductController::class, 'index'])->name('producto.index');
-Route::get('/producto/create', [ProductController::class, 'create'])->name('producto.create');
-Route::post('/producto/store', [ProductController::class, 'store'])->name('producto.store');
-Route::get('/producto/{product}/edit', [ProductController::class, 'edit'])->name('producto.edit');
-Route::put('/producto/{product}', [ProductController::class, 'update'])->name('producto.update');
-Route::delete('/producto/{product}', [ProductController::class, 'destroy'])->name('producto.destroy');
+Route::prefix('producto')->name('producto.')->controller(ProductController::class)->group(function () {
+    Route::get('/', 'index')->name('index');
+    Route::get('/create', 'create')->name('create');
+    Route::post('/store', 'store')->name('store');
+    Route::get('/{product}/edit', 'edit')->name('edit');
+    Route::put('/{product}', 'update')->name('update');
+    Route::delete('/{product}', 'destroy')->name('destroy');
+});

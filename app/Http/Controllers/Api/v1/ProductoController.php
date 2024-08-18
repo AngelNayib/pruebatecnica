@@ -1,31 +1,36 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\v1;
 
-use App\Http\Requests\StoreProductoRequest;
-use App\Models\Category;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\StoreProductoRequest as StorePro;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
-class ProductController extends Controller
+class ProductoController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     */
     public function index()
     {
-        return view('producto.index', [
-            'productos' => Product::orderBy('created_at', 'asc')->paginate(5)
-        ]);
+        return responseJson(200, 'ok', Product::with('category')->get());
     }
 
+    /**
+     * Show the form for creating a new resource.
+     */
     public function create()
     {
-        return view('producto.create', [
-            'categorias' => Category::all()
-        ]);
+        //
     }
 
-    public function store(StoreProductoRequest $request)
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(StorePro $request)
     {
         try {
             DB::beginTransaction();
@@ -34,7 +39,7 @@ class ProductController extends Controller
                 $fileUrl = Storage::disk('public')->put('images', $file);
             }
 
-            Product::create([
+            $producto = Product::create([
                 'nombre' => $request->nombre,
                 'descripcion' => $request->descripcion,
                 'precio' => $request->precio,
@@ -43,23 +48,38 @@ class ProductController extends Controller
                 'category_id' => $request->category_id
             ]);
             DB::commit();
-            return redirect()->route('producto.index')->with('success', 'Producto creado');
+            return responseJson(200, 'ok', $producto);
         } catch (\Exception $e) {
-            dd($e);
             DB::rollBack();
-            return redirect()->route('producto.create')->with('errors', $e->getMessage());
+            return responseJson(500, 'error', $e->getMessage());
         }
     }
 
-    public function edit(Product $product)
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
     {
-        return view('producto.edit', [
-            'producto' => $product,
-            'categorias' => Category::all()
-        ]);
+        try {
+            $product = Product::with('category')->find($id);
+            if (!$product) {
+                return responseJson(404, 'not found', 'product not found');
+            }
+            return responseJson(200, 'ok', $product);
+        } catch (\Exception $e) {
+            return responseJson(500, 'error', $e->getMessage());
+        }
     }
 
-    public function update(StoreProductoRequest $request, Product $product)
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id) {}
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
     {
         try {
             DB::beginTransaction();
@@ -67,6 +87,8 @@ class ProductController extends Controller
                 $file = $request->file('image');
                 $fileUrl = Storage::disk('public')->put('images', $file);
             }
+
+            $product = Product::find($id);
             $product->update([
                 'nombre' => $request->nombre,
                 'descripcion' => $request->descripcion,
@@ -76,25 +98,27 @@ class ProductController extends Controller
                 'category_id' => $request->category_id
             ]);
             DB::commit();
-            return redirect()->route('producto.index')->with('success', 'Producto actualizado');
+            return responseJson(200, 'ok', $product);
         } catch (\Exception $e) {
-            dd($e);
             DB::rollBack();
-            return redirect()->route('producto.edit', $product)->with('errors', $e->getMessage());
+            return responseJson(500, 'error', $e->getMessage());
         }
     }
 
-    public function destroy(Product $product)
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
     {
         try {
             DB::beginTransaction();
+            $product = Product::find($id);
             $product->delete();
             DB::commit();
-            return redirect()->route('producto.index')->with('success', 'Producto eliminado');
+            return responseJson(200, 'ok', $product);
         } catch (\Exception $e) {
-            dd($e);
             DB::rollBack();
-            return redirect()->route('producto.index')->with('errors', $e->getMessage());
+            return responseJson(500, 'error', $e->getMessage());
         }
     }
 }

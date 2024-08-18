@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,10 +15,23 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
+/* Route::get('/', function () {
     return view('producto.index');
-});
-Route::prefix('producto')->name('producto.')->controller(ProductController::class)->group(function () {
+}); */
+
+Route::get('/', function () {
+    return view('auth.login');
+})->name('login');
+
+Route::get('auth/register', function () {
+    return view('auth.register');
+})->name('register');
+
+Route::post('auth/register/user', [AuthController::class, 'register'])->name('register.user');
+Route::post('auth/login/user', [AuthController::class, 'login'])->name('login.user');
+Route::post('auth/logout/user', [AuthController::class, 'logout'])->name('logout.user');
+
+Route::middleware('auth')->prefix('producto')->name('producto.')->controller(ProductController::class)->group(function () {
     Route::get('/', 'index')->name('index');
     Route::get('/create', 'create')->name('create');
     Route::post('/store', 'store')->name('store');

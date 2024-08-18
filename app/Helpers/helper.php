@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Devuleve una respuesta JSON
+ * Devuleve una respuesta JSON con cuerpo predeterminado
  * @param int $status
  * @param string $description
  * @param array $content

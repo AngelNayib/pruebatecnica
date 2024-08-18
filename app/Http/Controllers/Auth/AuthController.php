@@ -13,6 +13,11 @@ use Illuminate\Support\Facades\Validator as FacadesValidator;
 
 class AuthController extends Controller
 {
+    /**
+     * Login Web
+     *     @param  \Illuminate\Http\Request  $request
+     *     @return \Illuminate\Http\Response
+     */
     public function login(Request $request)
     {
         $request->validate([
@@ -31,7 +36,11 @@ class AuthController extends Controller
         }
     }
 
-
+    /**
+     * Login API
+     *     @param  \Illuminate\Http\Request  $request
+     *     @return \Illuminate\Http\Response
+     */
     public function loginApi(Request $request)
     {
         $loginUserData = $request->validate([
@@ -53,6 +62,11 @@ class AuthController extends Controller
         return responseJson(200, 'ok', $token);
     }
 
+    /**
+     * Logout Web
+     *     @param  \Illuminate\Http\Request  $request
+     *     @return \Illuminate\Http\Response
+     */
     public function logout(Request $request)
     {
         auth()->logout();
@@ -61,6 +75,11 @@ class AuthController extends Controller
         return redirect()->route('login');
     }
 
+    /**
+     * Register Web
+     *     @param  \Illuminate\Http\Request  $request
+     *     @return \Illuminate\Http\Response
+     */
     public function register(Request $request)
     {
         try {

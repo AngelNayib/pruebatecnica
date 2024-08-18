@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
+    /**
+     * Muestra la lista de productos
+     * @return \Illuminate\Http\Response
+     *
+     */
     public function index()
     {
         return view('producto.index', [
@@ -18,6 +23,10 @@ class ProductController extends Controller
         ]);
     }
 
+    /**
+     * Muestra el formulario para crear un nuevo producto
+     * @return \Illuminate\Http\Response
+     */
     public function create()
     {
         return view('producto.create', [
@@ -25,10 +34,16 @@ class ProductController extends Controller
         ]);
     }
 
+    /**
+     * Almacena un nuevo producto
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function store(StoreProductoRequest $request)
     {
         try {
             DB::beginTransaction();
+            //Determina si se tiene el aprametro image en la peticion validacion extra
             if ($request->hasFile('image')) {
                 $file = $request->file('image');
                 $fileUrl = Storage::disk('public')->put('images', $file);
@@ -43,6 +58,7 @@ class ProductController extends Controller
                 'category_id' => $request->category_id
             ]);
             DB::commit();
+            //redirige en caso de exito con variables de sesion
             return redirect()->route('producto.index')->with('success', 'Producto creado');
         } catch (\Exception $e) {
             dd($e);
@@ -51,6 +67,11 @@ class ProductController extends Controller
         }
     }
 
+    /**
+     * Muestra el formulario para editar un producto
+     * @param  \App\Models\Product  $product
+     * @return \Illuminate\Http\Response
+     */
     public function edit(Product $product)
     {
         return view('producto.edit', [
@@ -59,6 +80,12 @@ class ProductController extends Controller
         ]);
     }
 
+    /**
+     * Actualiza un producto
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Product  $product
+     * @return \Illuminate\Http\Response
+     */
     public function update(StoreProductoRequest $request, Product $product)
     {
         try {
@@ -66,7 +93,7 @@ class ProductController extends Controller
             if ($request->hasFile('image')) {
                 $file = $request->file('image');
                 $fileUrl = Storage::disk('public')->put('images', $file);
-            }
+            } //TODO: Añadir tambien else en caso de no existir imagen
             $product->update([
                 'nombre' => $request->nombre,
                 'descripcion' => $request->descripcion,
@@ -84,6 +111,11 @@ class ProductController extends Controller
         }
     }
 
+    /**
+     *  Elimina un producto
+     * @param  \App\Models\Product  $product
+     * @return \Illuminate\Http\Response
+     */
     public function destroy(Product $product)
     {
         try {
